@@ -187,30 +187,30 @@ def page_generic(model, scaler, features, model_name, description, input_fields)
 # ==================== CONFIGURATION ====================
 
 PAGES_CONFIG = {
-    "Indice de Stress Thermique (HSI)": {
-        "key": "hsi",
-        "description": "Indice combinant température et humidité.",
-        "fields": {
-            "temperature_2m_max": {"type": "number", "label": "Température max (°C)", "value": 30.0, "step": 0.5},
-            "relative_humidity_2m_mean": {"type": "slider", "label": "Humidité (%)", "min": 0, "max": 100, "value": 70},
-        }
-    },
-    "Indice de Qualité de l'Air (IQA)": {
-        "key": "iqa",
-        "description": "Proxy qualité de l'air.",
-        "fields": {
-            "wind_speed_10m_max": {"type": "number", "label": "Vent max (m/s)", "value": 2.0, "step": 0.5},
-            "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
-        }
-    },
-    "Risque d'Inondation (FRI)": {"key": "fri", "description": "Risque d'inondation basé sur les précipitations.", "fields": {}},
-    "Indice de Sécheresse (SPEI)": {"key": "spei", "description": "Indice de sécheresse simplifié.", "fields": {}},
+    # "Indice de Stress Thermique (HSI)": {
+    #     "key": "hsi",
+    #     "description": "Indice combinant température et humidité.",
+    #     "fields": {
+    #         "temperature_2m_max": {"type": "number", "label": "Température max (°C)", "value": 30.0, "step": 0.5},
+    #         "relative_humidity_2m_mean": {"type": "slider", "label": "Humidité (%)", "min": 0, "max": 100, "value": 70},
+    #     }
+    # },
+    # "Indice de Qualité de l'Air (IQA)": {
+    #     "key": "iqa",
+    #     "description": "Proxy qualité de l'air.",
+    #     "fields": {
+    #         "wind_speed_10m_max": {"type": "number", "label": "Vent max (m/s)", "value": 2.0, "step": 0.5},
+    #         "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
+    #     }
+    # },
+    # "Risque d'Inondation (FRI)": {"key": "fri", "description": "Risque d'inondation basé sur les précipitations.", "fields": {}},
+    # "Indice de Sécheresse (SPEI)": {"key": "spei", "description": "Indice de sécheresse simplifié.", "fields": {}},
     "Risque Vectoriel (VRI)": {"key": "vri", "description": "", "fields": {}},
-    "Potentiel Solaire (SEP)": {"key": "sep", "description": "Potentiel de production solaire.", "fields": {}},
-    "Indice Composite de Risque Sanitaire (CHRI)": {"key": "chri", "description": "Combinaison HSI, IQA, VRI.", "fields": {}},
-    "Évapotranspiration (ETO)": {"key": "eto", "description": "Évapotranspiration de référence.", "fields": {}},
-    "Classification du code météo (Weather Code)": {"key": "weather_code", "description": "Classification WMO.", "fields": {}},
-    "Risque d'Incendie (Fire Risk)": {"key": "fire_risk", "description": "Risque d'incendie.", "fields": {}},
+    # "Potentiel Solaire (SEP)": {"key": "sep", "description": "Potentiel de production solaire.", "fields": {}},
+    # "Indice Composite de Risque Sanitaire (CHRI)": {"key": "chri", "description": "Combinaison HSI, IQA, VRI.", "fields": {}},
+    # "Évapotranspiration (ETO)": {"key": "eto", "description": "Évapotranspiration de référence.", "fields": {}},
+    # "Classification du code météo (Weather Code)": {"key": "weather_code", "description": "Classification WMO.", "fields": {}},
+    # "Risque d'Incendie (Fire Risk)": {"key": "fire_risk", "description": "Risque d'incendie.", "fields": {}},
 }
 
 # ==================== MAIN ====================

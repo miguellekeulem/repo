@@ -36,10 +36,17 @@ def load_model_and_scaler(model_name):
             - scaler: scaler ou None si fichier absent
             - features: liste des features ou None si fichier absent
     """
-    model_path = f"models/{model_name}_model.pkl"
-    scaler_path = f"models/{model_name}_scaler.pkl"
-    features_path = f"models/{model_name}_features.pkl"
+    # model_path = f"models/{model_name}_model.pkl"
+    # scaler_path = f"models/{model_name}_scaler.pkl"
+    # features_path = f"models/{model_name}_features.pkl"
     
+
+    model_path = f"{model_name}_model.pkl"
+    scaler_path = f"{model_name}_scaler.pkl"
+    features_path = f"{model_name}_features.pkl"
+    
+
+
     # Chargement du modèle (obligatoire)
     if not os.path.exists(model_path):
         st.error(f"Modèle introuvable : {model_path}")

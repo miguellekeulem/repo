@@ -161,22 +161,22 @@ def page_generic(model, scaler, features, model_name, description, input_fields)
 
 # Exemples de configurations pour quelques modèles (vous devez adapter selon vos modèles réels)
 PAGES_CONFIG = {
-    "Indice de Stress Thermique (HSI)": {
-        "key": "hsi",
-        "description": "Indice combinant température et humidité pour évaluer la sensation thermique.",
-        "fields": {
-            "temperature_2m_max": {"type": "number", "label": "Température max (°C)", "value": 30.0, "step": 0.5},
-            "relative_humidity_2m_mean": {"type": "slider", "label": "Humidité (%)", "min": 0, "max": 100, "value": 70},
-        }
-    },
-    "Indice de Qualité de l'Air (IQA)": {
-        "key": "iqa",
-        "description": "Proxy de qualité de l'air basé sur stagnation, rayonnement, saison.",
-        "fields": {
-            "wind_speed_10m_max": {"type": "number", "label": "Vent max (m/s)", "value": 2.0, "step": 0.5},
-            "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
-        }
-    },
+    # "Indice de Stress Thermique (HSI)": {
+    #     "key": "hsi",
+    #     "description": "Indice combinant température et humidité pour évaluer la sensation thermique.",
+    #     "fields": {
+    #         "temperature_2m_max": {"type": "number", "label": "Température max (°C)", "value": 30.0, "step": 0.5},
+    #         "relative_humidity_2m_mean": {"type": "slider", "label": "Humidité (%)", "min": 0, "max": 100, "value": 70},
+    #     }
+    # },
+    # "Indice de Qualité de l'Air (IQA)": {
+    #     "key": "iqa",
+    #     "description": "Proxy de qualité de l'air basé sur stagnation, rayonnement, saison.",
+    #     "fields": {
+    #         "wind_speed_10m_max": {"type": "number", "label": "Vent max (m/s)", "value": 2.0, "step": 0.5},
+    #         "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
+    #     }
+    # },
    # "Risque d'Inondation (FRI)": {"key": "fri", "description": "...", "fields": {}},
     #"Indice de Sécheresse (SPEI)": {"key": "spei", "description": "...", "fields": {}},
     "Risque Vectoriel (VRI)": {"key": "vri", "description": "...", "fields": {}},  # page spéciale ci-dessus

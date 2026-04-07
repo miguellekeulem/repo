@@ -41,9 +41,14 @@ def load_model_and_scaler(model_name):
     # features_path = f"models/{model_name}_features.pkl"
     
 
-    model_path = f"{model_name}_model.pkl"
-    scaler_path = f"{model_name}_scaler.pkl"
-    features_path = f"{model_name}_features.pkl"
+    # model_path = f"{model_name}_model.pkl"
+    # scaler_path = f"{model_name}_scaler.pkl"
+    # features_path = f"{model_name}_features.pkl"
+    
+
+    model_path = f"models/{model_name}_model.pkl"
+    scaler_path = f"models/{model_name}_scaler.pkl"
+    features_path = f"models/{model_name}_features.pkl"
     
 
 

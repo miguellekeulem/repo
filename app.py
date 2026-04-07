@@ -1,229 +1,102 @@
+# import streamlit as st
+# from pages_functions import (
+#     hsi_page, iqa_page, fri_page, spei_page, vri_page,
+#     sep_page, chri_page, eto_page, weather_code_page, fire_risk_page
+# )
+# from utils import load_model_and_scaler
+
+# st.set_page_config(page_title="IndabaX Climate Dashboard", layout="wide")
+# st.title("🌍 IA pour la résilience climatique et sanitaire – Cameroun")
+
+# # Menu déroulant dans la sidebar
+# st.sidebar.header("Navigation")
+# option = st.sidebar.selectbox(
+#     "Choisissez un modèle",
+#     [
+#         "Indice de Stress Thermique (HSI)",
+#         "Indice de Qualité de l'Air (IQA)",
+#         "Risque d'Inondation (FRI)",
+#         "Indice de Sécheresse (SPEI)",
+#         "Risque Vectoriel (VRI)",
+#         "Potentiel Solaire (SEP)",
+#         "Indice Composite de Risque Sanitaire (CHRI)",
+#         "Évapotranspiration (ETO)",
+#         "Classification du code météo (Weather Code)",
+#         "Risque d'Incendie (Fire Risk)"
+#     ]
+# )
+
+# # Dictionnaire associant le libellé au nom technique et à la fonction d'affichage
+# pages = {
+#     "Indice de Stress Thermique (HSI)": ("hsi", hsi_page.show_page),
+#     "Indice de Qualité de l'Air (IQA)": ("iqa", iqa_page.show_page),
+#     "Risque d'Inondation (FRI)": ("fri", fri_page.show_page),
+#     "Indice de Sécheresse (SPEI)": ("spei", spei_page.show_page),
+#     "Risque Vectoriel (VRI)": ("vri", vri_page.show_page),
+#     "Potentiel Solaire (SEP)": ("sep", sep_page.show_page),
+#     "Indice Composite de Risque Sanitaire (CHRI)": ("chri", chri_page.show_page),
+#     "Évapotranspiration (ETO)": ("eto", eto_page.show_page),
+#     "Classification du code météo (Weather Code)": ("weather_code", weather_code_page.show_page),
+#     "Risque d'Incendie (Fire Risk)": ("fire_risk", fire_risk_page.show_page),
+# }
+
+# model_key, page_func = pages[option]
+# # Chargement des artefacts (mise en cache automatique)
+# model, scaler, features = load_model_and_scaler(model_key)
+
+# # Appel de la fonction d'affichage spécifique
+# page_func(model, scaler, features)
+
+
+
+
 import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import joblib
-import os
-
-# ==================== UTILS ====================
-
-@st.cache_resource
-def load_model_and_scaler(model_name):
-    model_path = f"models/{model_name}_model.pkl"
-    scaler_path = f"models/{model_name}_scaler.pkl"
-    features_path = f"models/{model_name}_features.pkl"
-    
-    if not os.path.exists(model_path):
-        st.error(f"Modèle introuvable : {model_path}")
-        st.stop()
-    model = joblib.load(model_path)
-    
-    scaler = None
-    if os.path.exists(scaler_path):
-        scaler = joblib.load(scaler_path)
-    else:
-        st.warning(f"Scaler non trouvé pour {model_name}. Entrées brutes.")
-    
-    features = None
-    if os.path.exists(features_path):
-        features = joblib.load(features_path)
-    else:
-        st.info(f"Liste des features non trouvée pour {model_name}.")
-    
-    return model, scaler, features
-
-@st.cache_resource
-def load_city_encoder():
-    encoder_path = "models/city_encoder.pkl"
-    if os.path.exists(encoder_path):
-        return joblib.load(encoder_path)
-    else:
-        cities = [
-            "Abong-Mbang", "Akonolinga", "Ambam", "Bafoussam", "Bafia", "Bamenda",
-            "Batouri", "Bertoua", "Buea", "Dschang", "Ebolowa", "Edea", "Foumban",
-            "Garoua", "Guider", "Kousseri", "Kribi", "Kumba", "Kumbo", "Limbe",
-            "Loum", "Mamfe", "Maroua", "Mbalmayo", "Mbengwi", "Mbouda", "Meiganga",
-            "Mokolo", "Ngaoundere", "Nkongsamba", "Poli", "Sangmelima", "Tibati",
-            "Tignere", "Touboro", "Wum", "Yagoua", "Yaounde", "Yokadouma"
-        ]
-        cities = sorted(set(cities))
-        city_to_code = {city: idx for idx, city in enumerate(cities)}
-        return city_to_code
-
-def compute_is_dry_season(month):
-    return 1 if month in [11, 12, 1, 2, 3] else 0
-
-def safe_predict(model, X):
-    """Retourne la prédiction brute (peut être nombre, chaîne, etc.)."""
-    pred = model.predict(X)
-    # Si c'est un tableau/liste, on prend le premier élément
-    if isinstance(pred, (np.ndarray, list, pd.Series)):
-        if len(pred) == 0:
-            return "Aucune prédiction"
-        pred = pred[0]
-    return pred
-
-# ==================== PAGE VRI ====================
-
-def page_vri(model, scaler, features, model_key):
-    st.header("🦟 Indice de Risque Vectoriel (VRI)")
-    st.markdown("Le VRI évalue le risque de prolifération des moustiques vecteurs de maladies.")
-
-    if hasattr(model, 'feature_importances_') and features is not None:
-        if st.checkbox("Afficher l'importance des variables"):
-            imp_df = pd.DataFrame({
-                'feature': features,
-                'importance': model.feature_importances_
-            }).sort_values('importance', ascending=False)
-            fig = px.bar(imp_df, x='importance', y='feature', orientation='h')
-            st.plotly_chart(fig)
-    else:
-        st.info("Importance des variables non disponible.")
-
-    st.subheader("📝 Prédiction personnalisée")
-    
-    city_encoder = load_city_encoder()
-    city_names = list(city_encoder.keys()) if isinstance(city_encoder, dict) else city_encoder.classes_
-    
-    default_features_order = [
-        'temperature_2m_mean', 'relative_humidity_2m_mean',
-        'precipitation_sum', 'precipitation_hours', 'is_dry_season', 'city_encoded'
-    ]
-    
-    with st.form(key="vri_form"):
-        col1, col2 = st.columns(2)
-        with col1:
-            temp = st.number_input("🌡️ Température moyenne (°C)", value=25.0, step=0.5)
-            humidity = st.slider("💧 Humidité relative moyenne (%)", 0, 100, 70)
-            precip = st.number_input("☔ Précipitations totales (mm)", value=5.0, step=1.0)
-        with col2:
-            precip_hours = st.number_input("⏱️ Heures de précipitations", value=2.0, step=0.5, min_value=0.0, max_value=24.0)
-            month = st.selectbox("📅 Mois", list(range(1,13)), index=5)
-            city = st.selectbox("🏙️ Ville", city_names)
-        
-        is_dry = compute_is_dry_season(month)
-        st.write(f"Saison : {'Sèche' if is_dry else 'Pluvieuse'}")
-        
-        submitted = st.form_submit_button("Prédire le VRI")
-        if submitted:
-            if isinstance(city_encoder, dict):
-                city_code = city_encoder[city]
-            else:
-                city_code = city_encoder.transform([city])[0]
-            
-            input_dict = {
-                'temperature_2m_mean': temp,
-                'relative_humidity_2m_mean': humidity,
-                'precipitation_sum': precip,
-                'precipitation_hours': precip_hours,
-                'is_dry_season': is_dry,
-                'city_encoded': city_code
-            }
-            input_df = pd.DataFrame([input_dict])
-            
-            if features is not None:
-                missing = set(features) - set(input_df.columns)
-                if missing:
-                    st.error(f"Features manquantes : {missing}")
-                    st.stop()
-                input_df = input_df[features]
-            else:
-                input_df = input_df[default_features_order]
-                st.info("Ordre par défaut utilisé.")
-            
-            if scaler is not None:
-                input_scaled = scaler.transform(input_df)
-            else:
-                input_scaled = input_df.values
-            
-            pred = safe_predict(model, input_scaled)
-            # Affichage simple
-            st.success(f"🔮 **Résultat de la prédiction :** {pred}")
-
-# ==================== PAGE GÉNÉRIQUE ====================
-
-def page_generic(model, scaler, features, model_name, description, input_fields):
-    st.header(f"📊 {model_name}")
-    st.markdown(description)
-    
-    city_encoder = load_city_encoder()
-    city_names = list(city_encoder.keys()) if isinstance(city_encoder, dict) else city_encoder.classes_
-    
-    with st.form(key=f"form_{model_name}"):
-        inputs = {}
-        if features is not None and 'city_encoded' in features:
-            city = st.selectbox("🏙️ Ville", city_names)
-            if isinstance(city_encoder, dict):
-                inputs['city_encoded'] = city_encoder[city]
-            else:
-                inputs['city_encoded'] = city_encoder.transform([city])[0]
-        
-        for field_name, field_config in input_fields.items():
-            if field_config['type'] == 'number':
-                inputs[field_name] = st.number_input(field_config['label'], 
-                                                     value=field_config.get('value', 0.0),
-                                                     step=field_config.get('step', 0.1))
-            elif field_config['type'] == 'slider':
-                inputs[field_name] = st.slider(field_config['label'],
-                                               field_config['min'], field_config['max'],
-                                               field_config.get('value', 50))
-            elif field_config['type'] == 'select':
-                inputs[field_name] = st.selectbox(field_config['label'], field_config['options'])
-        
-        submitted = st.form_submit_button("Prédire")
-        if submitted:
-            input_df = pd.DataFrame([inputs])
-            if features is not None:
-                input_df = input_df[features]
-            if scaler is not None:
-                input_scaled = scaler.transform(input_df)
-            else:
-                input_scaled = input_df.values
-            pred = safe_predict(model, input_scaled)
-            st.success(f"🔮 **Résultat de la prédiction :** {pred}")
-
-# ==================== CONFIGURATION ====================
-
-PAGES_CONFIG = {
-    # "Indice de Stress Thermique (HSI)": {
-    #     "key": "hsi",
-    #     "description": "Indice combinant température et humidité.",
-    #     "fields": {
-    #         "temperature_2m_max": {"type": "number", "label": "Température max (°C)", "value": 30.0, "step": 0.5},
-    #         "relative_humidity_2m_mean": {"type": "slider", "label": "Humidité (%)", "min": 0, "max": 100, "value": 70},
-    #     }
-    # },
-    # "Indice de Qualité de l'Air (IQA)": {
-    #     "key": "iqa",
-    #     "description": "Proxy qualité de l'air.",
-    #     "fields": {
-    #         "wind_speed_10m_max": {"type": "number", "label": "Vent max (m/s)", "value": 2.0, "step": 0.5},
-    #         "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
-    #     }
-    # },
-    # "Risque d'Inondation (FRI)": {"key": "fri", "description": "Risque d'inondation basé sur les précipitations.", "fields": {}},
-    # "Indice de Sécheresse (SPEI)": {"key": "spei", "description": "Indice de sécheresse simplifié.", "fields": {}},
-    "Risque Vectoriel (VRI)": {"key": "vri", "description": "", "fields": {}},
-    # "Potentiel Solaire (SEP)": {"key": "sep", "description": "Potentiel de production solaire.", "fields": {}},
-    # "Indice Composite de Risque Sanitaire (CHRI)": {"key": "chri", "description": "Combinaison HSI, IQA, VRI.", "fields": {}},
-    # "Évapotranspiration (ETO)": {"key": "eto", "description": "Évapotranspiration de référence.", "fields": {}},
-    # "Classification du code météo (Weather Code)": {"key": "weather_code", "description": "Classification WMO.", "fields": {}},
-    # "Risque d'Incendie (Fire Risk)": {"key": "fire_risk", "description": "Risque d'incendie.", "fields": {}},
-}
-
-# ==================== MAIN ====================
+from pages_functions import (
+    hsi_page, iqa_page, fri_page, spei_page, vri_page,
+    sep_page, chri_page, eto_page, weather_code_page, fire_risk_page
+)
+from utils import load_model_and_scaler
 
 st.set_page_config(page_title="IndabaX Climate Dashboard", layout="wide")
 st.title("🌍 IA pour la résilience climatique et sanitaire – Cameroun")
 
+# Menu déroulant dans la sidebar
 st.sidebar.header("Navigation")
-option = st.sidebar.selectbox("Choisissez un modèle", list(PAGES_CONFIG.keys()))
+option = st.sidebar.selectbox(
+    "Choisissez un modèle",
+    [
+        "Indice de Qualité de l'Air (IQA)",
+        "Indice de Stress Thermique (HSI)",
+        # "Risque d'Inondation (FRI)",
+        # "Indice de Sécheresse (SPEI)",
+        "Risque Vectoriel (VRI)",
+        "Potentiel Solaire (SEP)",
+        # "Indice Composite de Risque Sanitaire (CHRI)",
+        # "Évapotranspiration (ETO)",
+        "Classification du code météo (Weather Code)",
+        # "Risque d'Incendie (Fire Risk)"
+    ]
+)
 
-config = PAGES_CONFIG[option]
-model_key = config["key"]
+# Dictionnaire associant le libellé au nom technique et à la fonction d'affichage
+pages = {
+    "Indice de Qualité de l'Air (IQA)": ("iqa", iqa_page.show_page),
+    "Indice de Stress Thermique (HSI)": ("hsi", hsi_page.show_page),
+    # "Risque d'Inondation (FRI)": ("fri", fri_page.show_page),
+    # "Indice de Sécheresse (SPEI)": ("spei", spei_page.show_page),
+    "Risque Vectoriel (VRI)": ("vri", vri_page.show_page),
+    "Potentiel Solaire (SEP)": ("sep", sep_page.show_page),
+    # "Indice Composite de Risque Sanitaire (CHRI)": ("chri", chri_page.show_page),
+    # "Évapotranspiration (ETO)": ("eto", eto_page.show_page),
+    "Classification du code météo (Weather Code)": ("weather_code", weather_code_page.show_page),
+    # "Risque d'Incendie (Fire Risk)": ("fire_risk", fire_risk_page.show_page),
+}
+
+model_key, page_func = pages[option]
+
+# Chargement des artefacts (le scaler et les features peuvent être None)
 model, scaler, features = load_model_and_scaler(model_key)
 
-if option == "Risque Vectoriel (VRI)":
-    page_vri(model, scaler, features, model_key)
-else:
-    page_generic(model, scaler, features, option, config["description"], config.get("fields", {}))
+# Appel de la fonction d'affichage spécifique
+# On passe également le nom technique (model_key) pour permettre à la page de connaître son identifiant
+page_func(model, scaler, features, model_key)

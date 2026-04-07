@@ -177,14 +177,14 @@ PAGES_CONFIG = {
             "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
         }
     },
-    "Risque d'Inondation (FRI)": {"key": "fri", "description": "...", "fields": {}},
-    "Indice de Sécheresse (SPEI)": {"key": "spei", "description": "...", "fields": {}},
+   # "Risque d'Inondation (FRI)": {"key": "fri", "description": "...", "fields": {}},
+    #"Indice de Sécheresse (SPEI)": {"key": "spei", "description": "...", "fields": {}},
     "Risque Vectoriel (VRI)": {"key": "vri", "description": "...", "fields": {}},  # page spéciale ci-dessus
-    "Potentiel Solaire (SEP)": {"key": "sep", "description": "...", "fields": {}},
-    "Indice Composite de Risque Sanitaire (CHRI)": {"key": "chri", "description": "...", "fields": {}},
-    "Évapotranspiration (ETO)": {"key": "eto", "description": "...", "fields": {}},
-    "Classification du code météo (Weather Code)": {"key": "weather_code", "description": "...", "fields": {}},
-    "Risque d'Incendie (Fire Risk)": {"key": "fire_risk", "description": "...", "fields": {}},
+    #"Potentiel Solaire (SEP)": {"key": "sep", "description": "...", "fields": {}},
+    #"Indice Composite de Risque Sanitaire (CHRI)": {"key": "chri", "description": "...", "fields": {}},
+    #"Évapotranspiration (ETO)": {"key": "eto", "description": "...", "fields": {}},
+    #"Classification du code météo (Weather Code)": {"key": "weather_code", "description": "...", "fields": {}},
+    #"Risque d'Incendie (Fire Risk)": {"key": "fire_risk", "description": "...", "fields": {}},
 }
 
 # ==================== APPLICATION PRINCIPALE ====================

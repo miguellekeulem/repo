@@ -38,7 +38,6 @@ def load_city_encoder():
     if os.path.exists(encoder_path):
         return joblib.load(encoder_path)
     else:
-        # Liste des villes (à adapter selon votre dataset)
         cities = [
             "Abong-Mbang", "Akonolinga", "Ambam", "Bafoussam", "Bafia", "Bamenda",
             "Batouri", "Bertoua", "Buea", "Dschang", "Ebolowa", "Edea", "Foumban",
@@ -55,13 +54,14 @@ def compute_is_dry_season(month):
     return 1 if month in [11, 12, 1, 2, 3] else 0
 
 def safe_predict(model, X):
-    """Effectue la prédiction et retourne un scalaire float."""
+    """Retourne la prédiction brute (peut être nombre, chaîne, etc.)."""
     pred = model.predict(X)
+    # Si c'est un tableau/liste, on prend le premier élément
     if isinstance(pred, (np.ndarray, list, pd.Series)):
         if len(pred) == 0:
-            return 0.0
+            return "Aucune prédiction"
         pred = pred[0]
-    return float(pred)
+    return pred
 
 # ==================== PAGE VRI ====================
 
@@ -137,9 +137,8 @@ def page_vri(model, scaler, features, model_key):
                 input_scaled = input_df.values
             
             pred = safe_predict(model, input_scaled)
-            pred_clamped = max(0.0, min(1.0, pred))
-            st.metric("VRI", f"{pred_clamped:.3f}")
-            st.progress(pred_clamped, text="Niveau de risque")
+            # Affichage simple
+            st.success(f"🔮 **Résultat de la prédiction :** {pred}")
 
 # ==================== PAGE GÉNÉRIQUE ====================
 
@@ -175,42 +174,41 @@ def page_generic(model, scaler, features, model_name, description, input_fields)
         if submitted:
             input_df = pd.DataFrame([inputs])
             if features is not None:
-                # Réordonner selon les features du modèle
                 input_df = input_df[features]
             if scaler is not None:
                 input_scaled = scaler.transform(input_df)
             else:
                 input_scaled = input_df.values
             pred = safe_predict(model, input_scaled)
-            st.metric("Prédiction", f"{pred:.2f}")
+            st.success(f"🔮 **Résultat de la prédiction :** {pred}")
 
 # ==================== CONFIGURATION ====================
 
 PAGES_CONFIG = {
-    # "Indice de Stress Thermique (HSI)": {
-    #     "key": "hsi",
-    #     "description": "Indice combinant température et humidité.",
-    #     "fields": {
-    #         "temperature_2m_max": {"type": "number", "label": "Température max (°C)", "value": 30.0, "step": 0.5},
-    #         "relative_humidity_2m_mean": {"type": "slider", "label": "Humidité (%)", "min": 0, "max": 100, "value": 70},
-    #     }
-    # },
-    # "Indice de Qualité de l'Air (IQA)": {
-    #     "key": "iqa",
-    #     "description": "Proxy qualité de l'air.",
-    #     "fields": {
-    #         "wind_speed_10m_max": {"type": "number", "label": "Vent max (m/s)", "value": 2.0, "step": 0.5},
-    #         "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
-    #     }
-    # },
-    # "Risque d'Inondation (FRI)": {"key": "fri", "description": "Risque d'inondation basé sur les précipitations.", "fields": {}},
-    # "Indice de Sécheresse (SPEI)": {"key": "spei", "description": "Indice de sécheresse simplifié.", "fields": {}},
+    "Indice de Stress Thermique (HSI)": {
+        "key": "hsi",
+        "description": "Indice combinant température et humidité.",
+        "fields": {
+            "temperature_2m_max": {"type": "number", "label": "Température max (°C)", "value": 30.0, "step": 0.5},
+            "relative_humidity_2m_mean": {"type": "slider", "label": "Humidité (%)", "min": 0, "max": 100, "value": 70},
+        }
+    },
+    "Indice de Qualité de l'Air (IQA)": {
+        "key": "iqa",
+        "description": "Proxy qualité de l'air.",
+        "fields": {
+            "wind_speed_10m_max": {"type": "number", "label": "Vent max (m/s)", "value": 2.0, "step": 0.5},
+            "precipitation_sum": {"type": "number", "label": "Pluie (mm)", "value": 0.0, "step": 1.0},
+        }
+    },
+    "Risque d'Inondation (FRI)": {"key": "fri", "description": "Risque d'inondation basé sur les précipitations.", "fields": {}},
+    "Indice de Sécheresse (SPEI)": {"key": "spei", "description": "Indice de sécheresse simplifié.", "fields": {}},
     "Risque Vectoriel (VRI)": {"key": "vri", "description": "", "fields": {}},
-    # "Potentiel Solaire (SEP)": {"key": "sep", "description": "Potentiel de production solaire.", "fields": {}},
-    # "Indice Composite de Risque Sanitaire (CHRI)": {"key": "chri", "description": "Combinaison HSI, IQA, VRI.", "fields": {}},
-    # "Évapotranspiration (ETO)": {"key": "eto", "description": "Évapotranspiration de référence.", "fields": {}},
-    # "Classification du code météo (Weather Code)": {"key": "weather_code", "description": "Classification WMO.", "fields": {}},
-    # "Risque d'Incendie (Fire Risk)": {"key": "fire_risk", "description": "Risque d'incendie.", "fields": {}},
+    "Potentiel Solaire (SEP)": {"key": "sep", "description": "Potentiel de production solaire.", "fields": {}},
+    "Indice Composite de Risque Sanitaire (CHRI)": {"key": "chri", "description": "Combinaison HSI, IQA, VRI.", "fields": {}},
+    "Évapotranspiration (ETO)": {"key": "eto", "description": "Évapotranspiration de référence.", "fields": {}},
+    "Classification du code météo (Weather Code)": {"key": "weather_code", "description": "Classification WMO.", "fields": {}},
+    "Risque d'Incendie (Fire Risk)": {"key": "fire_risk", "description": "Risque d'incendie.", "fields": {}},
 }
 
 # ==================== MAIN ====================
